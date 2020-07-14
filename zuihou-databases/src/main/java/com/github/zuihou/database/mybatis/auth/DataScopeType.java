@@ -1,11 +1,12 @@
 package com.github.zuihou.database.mybatis.auth;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.zuihou.base.BaseEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -19,29 +20,28 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @ApiModel(value = "DataScopeType", description = "数据权限类型-枚举")
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum DataScopeType implements BaseEnum {
 
     /**
-     * ALL=1全部
+     * ALL=5全部
      */
-    ALL(1, "全部"),
+    ALL(5, "全部"),
     /**
-     * THIS_LEVEL=2本级
+     * THIS_LEVEL=4本级
      */
-    THIS_LEVEL(2, "本级"),
+    THIS_LEVEL(4, "本级"),
     /**
      * THIS_LEVEL_CHILDREN=3本级以及子级
      */
     THIS_LEVEL_CHILDREN(3, "本级以及子级"),
     /**
-     * CUSTOMIZE=4自定义
+     * CUSTOMIZE=2自定义
      */
-    CUSTOMIZE(4, "自定义"),
+    CUSTOMIZE(2, "自定义"),
     /**
-     * SELF=5个人
+     * SELF=1个人
      */
-    SELF(5, "个人"),
+    SELF(1, "个人"),
     ;
 
     @ApiModelProperty(value = "描述")
@@ -51,24 +51,11 @@ public enum DataScopeType implements BaseEnum {
 
 
     public static DataScopeType match(String val, DataScopeType def) {
-        for (DataScopeType enm : DataScopeType.values()) {
-            if (enm.name().equalsIgnoreCase(val)) {
-                return enm;
-            }
-        }
-        return def;
+        return Stream.of(values()).parallel().filter((item) -> item.name().equalsIgnoreCase(val)).findAny().orElse(def);
     }
 
     public static DataScopeType match(Integer val, DataScopeType def) {
-        if (val == null) {
-            return def;
-        }
-        for (DataScopeType enm : DataScopeType.values()) {
-            if (val.equals(enm.getVal())) {
-                return enm;
-            }
-        }
-        return def;
+        return Stream.of(values()).parallel().filter((item) -> val != null && item.getVal() == val).findAny().orElse(def);
     }
 
     public static DataScopeType get(String val) {
@@ -79,15 +66,8 @@ public enum DataScopeType implements BaseEnum {
         return match(val, null);
     }
 
-    public boolean eq(String val) {
-        return this.name().equalsIgnoreCase(val);
-    }
-
     public boolean eq(DataScopeType val) {
-        if (val == null) {
-            return false;
-        }
-        return eq(val.name());
+        return val == null ? false : eq(val.name());
     }
 
     @Override

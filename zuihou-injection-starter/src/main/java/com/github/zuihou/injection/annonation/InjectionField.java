@@ -6,12 +6,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 远程查询字段
+ * 在某个对象的字段上标记该注解，该字段的值将被主动注入
+ * <p>
+ * 如：
+ *
+ * @author zuihou
+ * @InjectionField(api = "dictionaryItemServiceImpl", method = "findDictionaryItem")
+ * private String nation;
+ * @InjectionField(api = "dictionaryItemServiceImpl", method = "findDictionaryItem")
+ * private RemoteData<String,String>  nation;
+ *
  * <p>
  * 强烈建议：不要对象之间互相依赖
  * 如： User 想要注入 File， File也想注入User
- *
- * @author zuihou
  * @create 2020年01月18日17:59:25
  */
 
@@ -26,54 +33,54 @@ public @interface InjectionField {
     String key() default "";
 
     /**
-     * 执行查询任务的类
+     * 提供自动注入值的 查询类
      * <p/>
      * api()  和 feign() 任选其一,  使用 api时，请填写实现类， 使用feign时，填写接口即可
      * 如： @InjectionField(api="userServiceImpl") 等价于 @InjectionField(feign=UserService.class)
-     * 如： @InjectionField(api="userController") 等价于 @InjectionField(feign=UserApi.class)
+     * 如： @InjectionField(api="userApi") 等价于 @InjectionField(feign=UserApi.class)
      * <p>
-     * 注意：若使用feignclient调用， 则一定要加上 @FeignClient(qualifier = "xxxApi"), 否则会注入失败
+     * 注意：若使用feignClient调用， 则一定要加上 @FeignClient(qualifier = "userApi"), 否则会注入失败
      *
      * @return
      */
     String api() default "";
 
     /**
-     * 执行查询任务的类
+     * 提供自动注入值的 查询类
      * <p/>
      * api()  和 feign() 任选其一,  使用 api时，请填写实现类， 使用feign时，填写接口即可
      * 如： @InjectionField(api="userServiceImpl") 等价于 @InjectionField(feign=UserService.class)
-     * 如： @InjectionField(api="userController") 等价于 @InjectionField(feign=UserApi.class)
+     * 如： @InjectionField(api="userApi") 等价于 @InjectionField(feign=UserApi.class)
      * <p>
-     * 注意： 本系统中，最好不要使用feign 方式调用，否则 entity 会依赖 api 模块，造成依赖冲突！
+     * 注意：若使用feignClient调用， 则一定要加上 @FeignClient(qualifier = "userApi"), 否则会注入失败
      *
      * @return
      */
-    Class<? extends Object> feign() default Object.class;
+    Class<? extends Object> apiClass() default Object.class;
 
     /**
-     * 标记实体类的具体类型，用于强转
-     *
-     * @return
-     */
-    Class<? extends Object> beanClass() default Object.class;
-
-    /**
-     * 目标类中的调用方法
+     * 提供自动注入值的 查询方法
      * <p>
      * 若 找不到 api(feign) + method，则忽略该字段
+     * <p>
+     * 该方法的入参必须为 Set<Serializable> 类型
+     * 该方法的出参必须为 Map<Serializable, Object> 类型
      *
      * @return
      */
     String method() default "findByIds";
 
     /**
-     * 最大递归深度
-     * 防止 A、B对象 互相注入出现死循环
-     * 默认值 3 (事不过三~)
+     * 自动注入值的类型， 用于强制转换
      *
      * @return
      */
-    int depth() default 3;
+    Class<? extends Object> beanClass() default Object.class;
 
+    /**
+     * 自动注入值是字典时，需要指定该字典的 类型（c_common_dictionary_item 表的 dictionary_type 字段）
+     *
+     * @return
+     */
+    String dictType() default "";
 }
