@@ -19,7 +19,7 @@ import java.io.IOException;
 import static com.github.zuihou.cloud.interceptor.FeignAddHeaderRequestInterceptor.HEADER_NAME_LIST;
 
 /**
- * RestTemplateHeaderInterceptor 传递Request header
+ * 通过 RestTemplate 调用时，传递请求头和线程变量
  *
  * @author zuihou
  */
@@ -28,9 +28,8 @@ import static com.github.zuihou.cloud.interceptor.FeignAddHeaderRequestIntercept
 public class RestTemplateHeaderInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
-    public ClientHttpResponse intercept(
-            HttpRequest request, byte[] bytes,
-            ClientHttpRequestExecution execution) throws IOException {
+    public ClientHttpResponse intercept(HttpRequest request, byte[] bytes,
+                                        ClientHttpRequestExecution execution) throws IOException {
 
         HttpHeaders httpHeaders = request.getHeaders();
 
