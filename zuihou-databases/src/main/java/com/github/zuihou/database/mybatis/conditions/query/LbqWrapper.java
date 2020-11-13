@@ -17,6 +17,7 @@ package com.github.zuihou.database.mybatis.conditions.query;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
@@ -24,10 +25,9 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.zuihou.database.mybatis.typehandler.BaseLikeTypeHandler;
 import com.github.zuihou.model.RemoteData;
+import com.github.zuihou.utils.StrHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -253,33 +253,32 @@ public class LbqWrapper<T> extends AbstractLambdaWrapper<T, LbqWrapper<T>>
 
     @Override
     public LbqWrapper<T> like(SFunction<T, ?> column, Object val) {
-        return super.like(this.checkCondition(val), column, BaseLikeTypeHandler.likeConvert(val));
+        return super.like(this.checkCondition(val), column, StrHelper.keywordConvert(val));
     }
 
     @Override
     public LbqWrapper<T> likeLeft(SFunction<T, ?> column, Object val) {
-        return super.likeLeft(this.checkCondition(val), column, BaseLikeTypeHandler.likeConvert(val));
+        return super.likeLeft(this.checkCondition(val), column, StrHelper.keywordConvert(val));
     }
 
     @Override
     public LbqWrapper<T> likeRight(SFunction<T, ?> column, Object val) {
-        return super.likeRight(this.checkCondition(val), column, BaseLikeTypeHandler.likeConvert(val));
+        return super.likeRight(this.checkCondition(val), column, StrHelper.keywordConvert(val));
     }
 
     /**
      * 忽略实体中的某些字段，实体中的字段默认是会除了null以外的全部进行等值匹配
      * 再次可以进行忽略
      *
-     * @param <T>    这个是传入的待忽略字段的set方法
-     * @param column
+     * @param column 这个是传入的待忽略字段的set方法
+     * @param val
      * @return
      */
 
     @Override
     public LbqWrapper<T> notLike(SFunction<T, ?> column, Object val) {
-        return super.notLike(this.checkCondition(val), column, BaseLikeTypeHandler.likeConvert(val));
+        return super.notLike(this.checkCondition(val), column, StrHelper.keywordConvert(val));
     }
-
 
     //----------------以下为自定义方法---------
 
@@ -301,7 +300,7 @@ public class LbqWrapper<T> extends AbstractLambdaWrapper<T, LbqWrapper<T>>
      */
     private boolean checkCondition(Object val) {
         if (val instanceof String && this.skipEmpty) {
-            return StringUtils.isNotBlank((String) val);
+            return StrUtil.isNotBlank((String) val);
         }
         if (val instanceof Collection && this.skipEmpty) {
             return !((Collection) val).isEmpty();
